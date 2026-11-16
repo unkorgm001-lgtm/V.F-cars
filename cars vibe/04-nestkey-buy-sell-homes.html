@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4. NestKey Realty — Buy & Sell Family Homes</title>
+<link rel="stylesheet" href="shared.css">
+<style>:root { --accent: #6366f1; --accent-2: #38bdf8; }</style>
+</head>
+<body>
+<header><div class="container nav">
+  <div class="logo">NESTKEY REALTY <span class="badge">PAGE 4/5 • BUY & SELL HOMES</span></div>
+  <nav class="nav-links"><a href="index.html">All 5 Pages</a><a href="#valuation">Instant Offer</a><a href="#homes">Move-In Ready</a></nav>
+  <button class="btn btn-primary" onclick="openModal('Talk to a Local Neighborhood Agent')">Free Consultation</button>
+</div></header>
+
+<section class="container hero">
+  <div>
+    <span class="tag">1% LISTING FEE • INSTANT CASH OFFERS</span>
+    <h1>Buy Your Next Family Home or Get a Cash Offer in 60 Seconds.</h1>
+    <p>Switch between Buying and Selling modes, estimate your property's market value live, and book same-day open houses.</p>
+    <div class="pill-bar">
+      <button class="btn btn-outline active" id="buyModeBtn" onclick="setMode('buy')">I Want to Buy</button>
+      <button class="btn btn-outline" id="sellModeBtn" onclick="setMode('sell')">I Want to Sell</button>
+    </div>
+  </div>
+  <div id="valuation" class="calc-box">
+    <h3>Instant Home Value Estimator</h3>
+    <div class="field" style="margin-top:12px;"><label>Square Footage <span id="sqVal">2,200 sq ft</span></label><input type="range" id="sqft" min="900" max="5000" step="100" value="2200" oninput="calcVal()"></div>
+    <div class="field"><label>Condition</label>
+      <select id="cond" onchange="calcVal()">
+        <option value="245">Newly Renovated ($245/sq ft)</option>
+        <option value="210" selected>Move-In Ready ($210/sq ft)</option>
+        <option value="175">Needs Light Updates ($175/sq ft)</option>
+      </select>
+    </div>
+    <div style="background:#0f172a;padding:16px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+      <span>Estimated Market Value</span>
+      <strong id="valOut" style="font-size:1.7rem;color:var(--accent-2);">$462,000</strong>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="openModal('Request Locked Cash Offer')">Get Official Cash Offer</button>
+  </div>
+</section>
+
+<section id="homes" class="container" style="padding:20px 0;">
+  <h2 id="sectionHeading" style="margin-bottom:16px;">Move-In Ready Family Homes</h2>
+  <div class="grid-3" id="nestGrid"></div>
+</section>
+
+<div id="modal" class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle" style="margin-bottom:12px;">Connect With NestKey</h3>
+    <div class="field"><label>Street Address or Neighborhood</label><input type="text" placeholder="742 Evergreen Terrace"></div>
+    <div class="field"><label>Email Address</label><input type="text" placeholder="homeowner@example.com"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeModal();showToast('Report & agent match sent to your inbox!')">Submit</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast">Done!</div>
+<footer><div class="container">NestKey Realty • Landing Page 4 of 5 • <a href="index.html" style="color:var(--accent);">Back to Hub</a></div></footer>
+
+<script>
+const listings = [
+  { name: 'Maple Grove Colonial', tag: 'TOP SCHOOL DISTRICT', info: '4 Beds • 3 Baths • 2,450 sq ft', price: '$515,000' },
+  { name: 'Sunnyvale Craftsman', tag: 'NEW LISTING', info: '3 Beds • 2 Baths • 1,890 sq ft', price: '$429,000' },
+  { name: 'Cedar Creek Townhome', tag: 'LOW HOA', info: '3 Beds • 2.5 Baths • 1,720 sq ft', price: '$368,000' }
+];
+const sellerPerks = [
+  { name: 'Guaranteed Cash Offer', tag: 'CLOSE IN 10 DAYS', info: 'Skip showings, staging, and repairs with a direct cash buyout.', price: '0% Stress' },
+  { name: 'Full-Service 1% Listing', tag: 'SAVE $12,000+ AVG', info: 'Pro 3D tour, MLS syndication, and dedicated negotiator.', price: '1% Fee' },
+  { name: 'Buy Before You Sell', tag: 'BRIDGE PROGRAM', info: 'Unlock your current home equity to make a non-contingent offer.', price: 'Flexible' }
+];
+function setMode(mode) {
+  document.getElementById('buyModeBtn').classList.toggle('active', mode==='buy');
+  document.getElementById('sellModeBtn').classList.toggle('active', mode==='sell');
+  document.getElementById('sectionHeading').textContent = mode==='buy' ? 'Move-In Ready Family Homes' : 'Flexible Home Selling Programs';
+  const items = mode==='buy' ? listings : sellerPerks;
+  document.getElementById('nestGrid').innerHTML = items.map(i => `
+    <div class="card" style="padding:20px;">
+      <span class="tag">${i.tag}</span>
+      <h3 style="margin:10px 0 6px;">${i.name}</h3>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:14px;">${i.info}</p>
+      <div class="price" style="margin-bottom:14px;">${i.price}</div>
+      <button class="btn btn-primary" style="width:100%;" onclick="openModal('${i.name}')">${mode==='buy'?'Schedule Open House':'Start With This Option'}</button>
+    </div>`).join('');
+}
+function calcVal() {
+  const sq = +document.getElementById('sqft').value;
+  const rate = +document.getElementById('cond').value;
+  document.getElementById('sqVal').textContent = sq.toLocaleString() + ' sq ft';
+  document.getElementById('valOut').textContent = '$' + (sq * rate).toLocaleString();
+}
+function openModal(t){ document.getElementById('modalTitle').textContent=t; document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+setMode('buy'); calcVal();
+</script>
+</body></html>

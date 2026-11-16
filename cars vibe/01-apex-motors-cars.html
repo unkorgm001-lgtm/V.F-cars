@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1. Apex Motors — Performance & Luxury Car Sales</title>
+<link rel="stylesheet" href="shared.css">
+<style>:root { --accent: #ef4444; --accent-2: #f59e0b; }</style>
+</head>
+<body>
+<header><div class="container nav">
+  <div class="logo">APEX MOTORS <span class="badge">PAGE 1/5 • CARS</span></div>
+  <nav class="nav-links"><a href="index.html">All 5 Pages</a><a href="#inventory">Inventory</a><a href="#finance">EMI Calculator</a></nav>
+  <button class="btn btn-primary" onclick="openModal('Book VIP Test Drive')">Book Test Drive</button>
+</div></header>
+
+<section class="container hero">
+  <div>
+    <span class="tag">CERTIFIED EXOTIC & PERFORMANCE DEALERSHIP</span>
+    <h1>Drive Pure Engineering. Delivered to Your Door.</h1>
+    <p>Filter certified supercars and executive sedans, switch trim colors live, and calculate instant monthly financing.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="#inventory" class="btn btn-primary">Explore 2026 Fleet</a>
+      <button class="btn btn-outline" onclick="toggleCompareBanner()">Compare Selected (<span id="cmpCount">0</span>)</button>
+    </div>
+  </div>
+  <div class="calc-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <strong>Live Paint Visualizer</strong>
+      <span id="paintLabel" class="tag">Rosso Corsa Red</span>
+    </div>
+    <svg id="carSvg" viewBox="0 0 420 170" width="100%" style="background:#0f172a;border-radius:12px;padding:12px;">
+      <path id="carBody" d="M40,120 L65,75 L145,55 L265,55 L345,82 L385,105 L385,125 L35,125 Z" fill="#ef4444"/>
+      <polygon points="150,62 255,62 315,84 125,84" fill="#1e293b"/>
+      <circle cx="110" cy="126" r="26" fill="#090d16" stroke="#94a3b8" stroke-width="5"/>
+      <circle cx="315" cy="126" r="26" fill="#090d16" stroke="#94a3b8" stroke-width="5"/>
+    </svg>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn btn-outline" onclick="setPaint('#ef4444','Rosso Corsa Red')">Red</button>
+      <button class="btn btn-outline" onclick="setPaint('#3b82f6','Sapphire Blue')">Blue</button>
+      <button class="btn btn-outline" onclick="setPaint('#eab308','Solar Yellow')">Yellow</button>
+      <button class="btn btn-outline" onclick="setPaint('#e2e8f0','Glacier Silver')">Silver</button>
+    </div>
+  </div>
+</section>
+
+<section id="inventory" class="container" style="padding:20px 0;">
+  <h2 style="margin-bottom:14px;">Featured Vehicles</h2>
+  <div class="pill-bar">
+    <button class="btn btn-outline active" onclick="filterCars('all', this)">All Models</button>
+    <button class="btn btn-outline" onclick="filterCars('coupe', this)">Sports Coupe</button>
+    <button class="btn btn-outline" onclick="filterCars('suv', this)">Luxury SUV</button>
+    <button class="btn btn-outline" onclick="filterCars('sedan', this)">Executive Sedan</button>
+  </div>
+  <div class="grid-3" id="carGrid"></div>
+</section>
+
+<section id="finance" class="container" style="padding:40px 0;">
+  <div class="grid-2">
+    <div class="calc-box">
+      <h3 style="margin-bottom:16px;">Interactive Auto Loan Calculator</h3>
+      <div class="field"><label>Vehicle Price <span id="pVal">$85,000</span></label><input type="range" id="carPrice" min="30000" max="250000" step="5000" value="85000" oninput="calcAuto()"></div>
+      <div class="field"><label>Down Payment <span id="dVal">$15,000</span></label><input type="range" id="downPay" min="0" max="100000" step="2500" value="15000" oninput="calcAuto()"></div>
+      <div class="field"><label>Term (Months) <span id="mVal">60 mo</span></label><input type="range" id="months" min="24" max="84" step="12" value="60" oninput="calcAuto()"></div>
+    </div>
+    <div class="calc-box" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+      <span class="tag">ESTIMATED MONTHLY PAYMENT (5.4% APR)</span>
+      <div id="monthlyOut" style="font-size:3rem;font-weight:800;color:var(--accent-2);margin:12px 0;">$1,334/mo</div>
+      <button class="btn btn-primary" onclick="openModal('Pre-Qualify for Auto Financing')">Lock This Rate Now</button>
+    </div>
+  </div>
+</section>
+
+<div id="modal" class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle" style="margin-bottom:12px;">Schedule Inquiry</h3>
+    <div class="field"><label>Full Name</label><input type="text" placeholder="Alex Morgan"></div>
+    <div class="field"><label>Phone or Email</label><input type="text" placeholder="+1 (555) 234-5678"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal();showToast('Request confirmed! A specialist will call within 15 mins.')">Confirm</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast">Saved!</div>
+<footer><div class="container">Apex Motors • Landing Page 1 of 5 • <a href="index.html" style="color:var(--accent);">Back to Hub</a></div></footer>
+
+<script>
+const cars = [
+  { name: 'Veloce GT-R V8', cat: 'coupe', price: 118000, hp: '640 HP', zero60: '2.9s' },
+  { name: 'Aurelia X7 Sport', cat: 'suv', price: 89500, hp: '523 HP', zero60: '4.1s' },
+  { name: 'Sovereign S500', cat: 'sedan', price: 96000, hp: '496 HP', zero60: '4.3s' },
+  { name: 'Apex RS Spyder', cat: 'coupe', price: 145000, hp: '710 HP', zero60: '2.7s' },
+  { name: 'Cayenne Turbo GT', cat: 'suv', price: 132000, hp: '650 HP', zero60: '3.1s' },
+  { name: 'Meridian M8 Gran', cat: 'sedan', price: 109000, hp: '617 HP', zero60: '3.0s' }
+];
+let compared = new Set();
+function renderCars(filter='all') {
+  const grid = document.getElementById('carGrid');
+  grid.innerHTML = cars.filter(c => filter==='all' || c.cat===filter).map(c => `
+    <div class="card" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;"><span class="tag">${c.cat.toUpperCase()}</span><span class="tag">${c.hp} • 0-60: ${c.zero60}</span></div>
+      <h3 style="margin:12px 0 6px;">${c.name}</h3>
+      <div class="price" style="margin-bottom:16px;">$${c.price.toLocaleString()}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="openModal('Reserve ${c.name}')">Reserve</button>
+        <button class="btn btn-outline" onclick="toggleCmp('${c.name}')">${compared.has(c.name)?'✓ Added':'+ Compare'}</button>
+      </div>
+    </div>`).join('');
+}
+function filterCars(cat, btn) {
+  document.querySelectorAll('.pill-bar .btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); renderCars(cat);
+}
+function toggleCmp(name) {
+  compared.has(name) ? compared.delete(name) : compared.add(name);
+  document.getElementById('cmpCount').textContent = compared.size;
+  renderCars(); showToast(`Comparison list updated (${compared.size} vehicles)`);
+}
+function toggleCompareBanner() {
+  showToast(compared.size ? 'Comparing: ' + [...compared].join(' vs ') : 'Click "+ Compare" on any car card first.');
+}
+function setPaint(hex, label) {
+  document.getElementById('carBody').setAttribute('fill', hex);
+  document.getElementById('paintLabel').textContent = label;
+}
+function calcAuto() {
+  const p = +document.getElementById('carPrice').value;
+  const d = Math.min(+document.getElementById('downPay').value, p - 5000);
+  const m = +document.getElementById('months').value;
+  document.getElementById('pVal').textContent = '$' + p.toLocaleString();
+  document.getElementById('dVal').textContent = '$' + d.toLocaleString();
+  document.getElementById('mVal').textContent = m + ' mo';
+  const r = 0.054 / 12;
+  const emi = Math.round(((p - d) * r) / (1 - Math.pow(1 + r, -m)));
+  document.getElementById('monthlyOut').textContent = '$' + emi.toLocaleString() + '/mo';
+}
+function openModal(t){ document.getElementById('modalTitle').textContent=t; document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+renderCars(); calcAuto();
+</script>
+</body></html>

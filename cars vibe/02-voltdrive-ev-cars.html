@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2. VoltDrive EV — Electric Vehicle Marketplace</title>
+<link rel="stylesheet" href="shared.css">
+<style>:root { --accent: #10b981; --accent-2: #34d399; }</style>
+</head>
+<body>
+<header><div class="container nav">
+  <div class="logo">VOLTDRIVE EV <span class="badge">PAGE 2/5 • ELECTRIC CARS</span></div>
+  <nav class="nav-links"><a href="index.html">All 5 Pages</a><a href="#models">EV Lineup</a><a href="#savings">Gas Savings</a></nav>
+  <button class="btn btn-primary" onclick="openModal('Order EV Home Charger + Test Drive')">Order Online</button>
+</div></header>
+
+<section class="container hero">
+  <div>
+    <span class="tag">ZERO EMISSIONS • $7,500 TAX CREDIT ELIGIBLE</span>
+    <h1>Future-Proof Your Commute With Long-Range EVs.</h1>
+    <p>Compare real-world battery range, switch between Standard & Performance dual-motor trims, and calculate annual fuel savings.</p>
+    <div style="display:flex;gap:12px;">
+      <a href="#models" class="btn btn-primary">Configure EV</a>
+      <button class="btn btn-outline" id="taxBtn" onclick="toggleTax()">Apply $7,500 Tax Credit: OFF</button>
+    </div>
+  </div>
+  <div class="calc-box">
+    <h3>Interactive Range & Weather Simulator</h3>
+    <div class="field" style="margin-top:14px;"><label>Highway Speed <span id="spdVal">65 mph</span></label><input type="range" id="spd" min="45" max="85" value="65" oninput="calcRange()"></div>
+    <div class="field"><label>Outside Temp <span id="tmpVal">72°F</span></label><input type="range" id="tmp" min="15" max="105" value="72" oninput="calcRange()"></div>
+    <div style="background:#0f172a;padding:16px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+      <span>Estimated Real-World Range</span>
+      <strong id="rngOut" style="font-size:1.7rem;color:var(--accent-2);">348 miles</strong>
+    </div>
+  </div>
+</section>
+
+<section id="models" class="container" style="padding:20px 0;">
+  <h2 style="margin-bottom:16px;">2026 Electric Lineup</h2>
+  <div class="grid-3" id="evGrid"></div>
+</section>
+
+<section id="savings" class="container" style="padding:40px 0;">
+  <div class="calc-box">
+    <h3>5-Year Gas vs. Electric Savings Calculator</h3>
+    <div class="grid-2" style="margin-top:16px;align-items:center;">
+      <div>
+        <div class="field"><label>Weekly Miles Driven <span id="miVal">250 mi</span></label><input type="range" id="weeklyMi" min="50" max="700" step="25" value="250" oninput="calcGas()"></div>
+        <div class="field"><label>Local Gas Price <span id="gasVal">$3.80/gal</span></label><input type="range" id="gasPrice" min="2.5" max="6.0" step="0.1" value="3.8" oninput="calcGas()"></div>
+      </div>
+      <div style="text-align:center;background:#0f172a;padding:24px;border-radius:12px;">
+        <span class="tag">ESTIMATED 5-YEAR FUEL SAVINGS</span>
+        <div id="saveOut" style="font-size:2.8rem;font-weight:800;color:var(--accent-2);margin:8px 0;">$6,420</div>
+        <small style="color:var(--muted);">Compared to a 28 MPG gasoline vehicle at $0.14/kWh home charging</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="modal" class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle" style="margin-bottom:12px;">Reserve EV</h3>
+    <div class="field"><label>Full Name</label><input type="text" placeholder="Jordan Lee"></div>
+    <div class="field"><label>ZIP Code (for Incentive Check)</label><input type="text" placeholder="90210"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeModal();showToast('EV build locked! Refundable $100 deposit link sent.')">Lock Build</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast">Updated!</div>
+<footer><div class="container">VoltDrive EV • Landing Page 2 of 5 • <a href="index.html" style="color:var(--accent);">Back to Hub</a></div></footer>
+
+<script>
+let taxApplied = false;
+const evs = [
+  { name: 'Volt Aero Sedan', base: 44900, range: '360 mi', charge: '18 min (10-80%)' },
+  { name: 'Volt Terra SUV', base: 52900, range: '330 mi', charge: '20 min (10-80%)' },
+  { name: 'Volt Pulse Hatch', base: 34500, range: '295 mi', charge: '22 min (10-80%)' }
+];
+function renderEVs() {
+  document.getElementById('evGrid').innerHTML = evs.map(e => {
+    const finalPrice = taxApplied ? e.base - 7500 : e.base;
+    return `<div class="card" style="padding:20px;">
+      <span class="tag">DUAL MOTOR AWD</span>
+      <h3 style="margin:10px 0 4px;">${e.name}</h3>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:12px;">Range: ${e.range} • Fast Charge: ${e.charge}</p>
+      <div class="price" style="margin-bottom:14px;">$${finalPrice.toLocaleString()} ${taxApplied?'<small style="font-size:0.75rem;color:#34d399;">(After $7.5k credit)</small>':''}</div>
+      <button class="btn btn-primary" style="width:100%;" onclick="openModal('Configure ${e.name}')">Build & Order</button>
+    </div>`;
+  }).join('');
+}
+function toggleTax() {
+  taxApplied = !taxApplied;
+  document.getElementById('taxBtn').textContent = 'Apply $7,500 Tax Credit: ' + (taxApplied ? 'ON' : 'OFF');
+  document.getElementById('taxBtn').classList.toggle('active', taxApplied);
+  renderEVs();
+}
+function calcRange() {
+  const s = +document.getElementById('spd').value;
+  const t = +document.getElementById('tmp').value;
+  document.getElementById('spdVal').textContent = s + ' mph';
+  document.getElementById('tmpVal').textContent = t + '°F';
+  const speedPenalty = (s - 65) * 2.2;
+  const tempPenalty = Math.abs(t - 70) * 0.65;
+  document.getElementById('rngOut').textContent = Math.max(190, Math.round(350 - speedPenalty - tempPenalty)) + ' miles';
+}
+function calcGas() {
+  const mi = +document.getElementById('weeklyMi').value;
+  const gp = +document.getElementById('gasPrice').value;
+  document.getElementById('miVal').textContent = mi + ' mi';
+  document.getElementById('gasVal').textContent = '$' + gp.toFixed(2) + '/gal';
+  const annualMiles = mi * 52;
+  const gasCost = (annualMiles / 28) * gp;
+  const evCost = (annualMiles / 3.8) * 0.14;
+  document.getElementById('saveOut').textContent = '$' + Math.max(0, Math.round((gasCost - evCost) * 5)).toLocaleString();
+}
+function openModal(t){ document.getElementById('modalTitle').textContent=t; document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+renderEVs(); calcRange(); calcGas();
+</script>
+</body></html>

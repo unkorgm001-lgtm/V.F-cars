@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3. HavenLux Estates — Luxury Homes & Villas</title>
+<link rel="stylesheet" href="shared.css">
+<style>:root { --accent: #d97706; --accent-2: #fbbf24; }</style>
+</head>
+<body>
+<header><div class="container nav">
+  <div class="logo">HAVENLUX ESTATES <span class="badge">PAGE 3/5 • LUXURY HOMES</span></div>
+  <nav class="nav-links"><a href="index.html">All 5 Pages</a><a href="#listings">Properties</a><a href="#mortgage">Mortgage</a></nav>
+  <button class="btn btn-primary" onclick="openModal('Request Private Architectural Tour')">Private Tour</button>
+</div></header>
+
+<section class="container hero">
+  <div>
+    <span class="tag">ARCHITECTURAL VILLAS • WATERFRONT • PENTHOUSES</span>
+    <h1>Extraordinary Homes Curated for Modern Living.</h1>
+    <p>Filter properties by bedrooms and lifestyle, save favorites to your private portfolio, and model monthly mortgage payments.</p>
+    <div style="display:flex;gap:12px;">
+      <a href="#listings" class="btn btn-primary">Browse Estates</a>
+      <button class="btn btn-outline" onclick="showSaved()">Saved Homes (<span id="favCount">0</span>)</button>
+    </div>
+  </div>
+  <div class="calc-box">
+    <h3>Quick Property Finder</h3>
+    <div class="field" style="margin-top:12px;"><label>Location / Neighborhood</label>
+      <select id="locFilter" onchange="renderHomes()">
+        <option value="all">All Prime Locations</option>
+        <option value="coastal">Coastal Waterfront</option>
+        <option value="hills">Beverly & Canyon Hills</option>
+        <option value="skyline">Downtown Skyline</option>
+      </select>
+    </div>
+    <div class="field"><label>Minimum Bedrooms</label>
+      <div class="pill-bar" style="margin-bottom:0;">
+        <button class="btn btn-outline active" onclick="setBeds(0,this)">Any</button>
+        <button class="btn btn-outline" onclick="setBeds(3,this)">3+ Beds</button>
+        <button class="btn btn-outline" onclick="setBeds(4,this)">4+ Beds</button>
+        <button class="btn btn-outline" onclick="setBeds(5,this)">5+ Beds</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="listings" class="container" style="padding:20px 0;">
+  <h2 style="margin-bottom:16px;">Exclusive Listings</h2>
+  <div class="grid-3" id="homeGrid"></div>
+</section>
+
+<section id="mortgage" class="container" style="padding:40px 0;">
+  <div class="grid-2">
+    <div class="calc-box">
+      <h3>Home Mortgage Estimator</h3>
+      <div class="field" style="margin-top:14px;"><label>Home Price <span id="hpVal">$1,450,000</span></label><input type="range" id="homePrice" min="400000" max="5000000" step="50000" value="1450000" oninput="calcMortgage()"></div>
+      <div class="field"><label>Down Payment (20%+) <span id="hdVal">$290,000</span></label><input type="range" id="homeDown" min="50000" max="2000000" step="25000" value="290000" oninput="calcMortgage()"></div>
+      <div class="field"><label>Interest Rate <span id="hrVal">6.1%</span></label><input type="range" id="homeRate" min="3.5" max="8.5" step="0.1" value="6.1" oninput="calcMortgage()"></div>
+    </div>
+    <div class="calc-box" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+      <span class="tag">30-YEAR FIXED PRINCIPAL & INTEREST</span>
+      <div id="mortOut" style="font-size:2.9rem;font-weight:800;color:var(--accent-2);margin:12px 0;">$7,030/mo</div>
+      <button class="btn btn-primary" onclick="openModal('Get Pre-Approval Letter')">Get Instant Pre-Approval</button>
+    </div>
+  </div>
+</section>
+
+<div id="modal" class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle" style="margin-bottom:12px;">Schedule Viewing</h3>
+    <div class="field"><label>Your Name</label><input type="text" placeholder="Sophia Bennett"></div>
+    <div class="field"><label>Preferred Tour Date</label><input type="text" placeholder="This Saturday at 2:00 PM"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal();showToast('Private showing confirmed with Senior Advisor.')">Confirm Viewing</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast">Saved!</div>
+<footer><div class="container">HavenLux Estates • Landing Page 3 of 5 • <a href="index.html" style="color:var(--accent);">Back to Hub</a></div></footer>
+
+<script>
+const homes = [
+  { title: 'Villa Solis Infinity', loc: 'coastal', beds: 5, baths: 6, sqft: '6,200', price: 3450000 },
+  { title: 'Canyon Glass Pavilion', loc: 'hills', beds: 4, baths: 5, sqft: '4,850', price: 2690000 },
+  { title: 'Skyline Apex Penthouse', loc: 'skyline', beds: 3, baths: 4, sqft: '3,400', price: 1890000 },
+  { title: 'Azure Cove Residence', loc: 'coastal', beds: 6, baths: 7, sqft: '7,500', price: 4950000 },
+  { title: 'Oakridge Modern Manor', loc: 'hills', beds: 5, baths: 5, sqft: '5,300', price: 2250000 },
+  { title: 'The Foundry Loft', loc: 'skyline', beds: 3, baths: 3, sqft: '2,750', price: 1280000 }
+];
+let minBeds = 0, saved = new Set();
+function setBeds(b, btn) {
+  minBeds = b;
+  btn.parentElement.querySelectorAll('.btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active'); renderHomes();
+}
+function renderHomes() {
+  const loc = document.getElementById('locFilter').value;
+  document.getElementById('homeGrid').innerHTML = homes
+    .filter(h => (loc==='all' || h.loc===loc) && h.beds >= minBeds)
+    .map(h => `<div class="card" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;"><span class="tag">${h.loc.toUpperCase()}</span><span class="tag">${h.beds} BD • ${h.baths} BA • ${h.sqft} SQFT</span></div>
+      <h3 style="margin:12px 0 6px;">${h.title}</h3>
+      <div class="price" style="margin-bottom:16px;">$${h.price.toLocaleString()}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="openModal('Tour ${h.title}')">Book Tour</button>
+        <button class="btn btn-outline" onclick="toggleFav('${h.title}')">${saved.has(h.title)?'♥ Saved':'♡ Save'}</button>
+      </div>
+    </div>`).join('');
+}
+function toggleFav(t) {
+  saved.has(t) ? saved.delete(t) : saved.add(t);
+  document.getElementById('favCount').textContent = saved.size;
+  renderHomes(); showToast(saved.has(t) ? 'Added to saved homes' : 'Removed from saved');
+}
+function showSaved() { showToast(saved.size ? 'Saved: ' + [...saved].join(', ') : 'Click ♡ Save on any property first.'); }
+function calcMortgage() {
+  const p = +document.getElementById('homePrice').value;
+  const d = Math.min(+document.getElementById('homeDown').value, p - 50000);
+  const rate = +document.getElementById('homeRate').value;
+  document.getElementById('hpVal').textContent = '$' + p.toLocaleString();
+  document.getElementById('hdVal').textContent = '$' + d.toLocaleString();
+  document.getElementById('hrVal').textContent = rate.toFixed(1) + '%';
+  const r = (rate / 100) / 12, n = 360;
+  const m = Math.round(((p - d) * r) / (1 - Math.pow(1 + r, -n)));
+  document.getElementById('mortOut').textContent = '$' + m.toLocaleString() + '/mo';
+}
+function openModal(t){ document.getElementById('modalTitle').textContent=t; document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+renderHomes(); calcMortgage();
+</script>
+</body></html>

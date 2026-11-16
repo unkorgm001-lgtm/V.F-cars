@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5. AutoNest — Bundle Your Dream Home & Car</title>
+<link rel="stylesheet" href="shared.css">
+<style>:root { --accent: #ec4899; --accent-2: #f59e0b; }</style>
+</head>
+<body>
+<header><div class="container nav">
+  <div class="logo">AUTONEST <span class="badge">PAGE 5/5 • CARS + HOMES BUNDLE</span></div>
+  <nav class="nav-links"><a href="index.html">All 5 Pages</a><a href="#combo">Bundle Builder</a><a href="#deals">Featured Pairs</a></nav>
+  <button class="btn btn-primary" onclick="openModal('Claim $5,000 Home + Auto Closing Bonus')">Claim $5k Bonus</button>
+</div></header>
+
+<section class="container hero">
+  <div>
+    <span class="tag">ONE CLOSING • DUAL FINANCING DISCOUNT</span>
+    <h1>New Driveway. New Keys. Bundle Your Home & Car Together.</h1>
+    <p>Relocating or upgrading? Pair a certified vehicle with your new home purchase and save up to $5,000 in closing & delivery fees.</p>
+    <a href="#combo" class="btn btn-primary">Build Your Home + Car Bundle</a>
+  </div>
+  <div id="combo" class="calc-box">
+    <h3>Live Home + Car Bundle Configurator</h3>
+    <div class="field" style="margin-top:12px;"><label>1. Choose Your Home</label>
+      <select id="bHome" onchange="updateBundle()">
+        <option value="450000">Suburban 4BD Modern Home ($450,000)</option>
+        <option value="680000">Lakeview Executive Villa ($680,000)</option>
+        <option value="340000">City Smart Townhouse ($340,000)</option>
+      </select>
+    </div>
+    <div class="field"><label>2. Choose Your Driveway Vehicle</label>
+      <select id="bCar" onchange="updateBundle()">
+        <option value="42000">2026 Family Hybrid SUV ($42,000)</option>
+        <option value="68000">2026 Performance Luxury Sedan ($68,000)</option>
+        <option value="35000">2026 Long-Range EV Crossover ($35,000)</option>
+      </select>
+    </div>
+    <div style="background:#0f172a;padding:16px;border-radius:10px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>Bundle Discount Applied:</span><strong style="color:#10b981;">-$5,000</strong></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;"><span>Combined Package Total:</span><strong id="bTotal" style="font-size:1.5rem;color:var(--accent-2);">$487,000</strong></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="openModal('Lock Combined Home + Car Quote')">Lock Combined Quote</button>
+  </div>
+</section>
+
+<section id="deals" class="container" style="padding:20px 0;">
+  <h2 style="margin-bottom:16px;">Ready-to-Move Curated Combos</h2>
+  <div class="grid-3">
+    <div class="card" style="padding:20px;">
+      <span class="tag">FAMILY RELOCATION PACK</span>
+      <h3 style="margin:10px 0 6px;">4BD Oak Home + 7-Seat SUV</h3>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px;">Includes EV garage charger installation & 1-year home warranty.</p>
+      <div class="price" style="margin-bottom:14px;">$499,000 <small style="font-size:0.8rem;color:#10b981;">Save $5,000</small></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="openModal('Reserve Family Relocation Pack')">Reserve Bundle</button>
+    </div>
+    <div class="card" style="padding:20px;">
+      <span class="tag">EXECUTIVE LIFESTYLE PACK</span>
+      <h3 style="margin:10px 0 6px;">Skyline Penthouse + Sports Coupe</h3>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px;">Includes 2 reserved underground stalls & concierge transfer.</p>
+      <div class="price" style="margin-bottom:14px;">$945,000 <small style="font-size:0.8rem;color:#10b981;">Save $8,500</small></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="openModal('Reserve Executive Pack')">Reserve Bundle</button>
+    </div>
+    <div class="card" style="padding:20px;">
+      <span class="tag">ECO STARTER PACK</span>
+      <h3 style="margin:10px 0 6px;">Solar Townhome + Compact EV</h3>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px;">Zero-bill rooftop solar + Level 2 fast charger pre-installed.</p>
+      <div class="price" style="margin-bottom:14px;">$372,000 <small style="font-size:0.8rem;color:#10b981;">Save $4,200</small></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="openModal('Reserve Eco Starter Pack')">Reserve Bundle</button>
+    </div>
+  </div>
+</section>
+
+<div id="modal" class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle" style="margin-bottom:12px;">Lock Bundle Offer</h3>
+    <div class="field"><label>Full Name</label><input type="text" placeholder="Liam Carter"></div>
+    <div class="field"><label>Target Move-In Month</label><input type="text" placeholder="Next Month"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal();showToast('Bundle voucher reserved for 14 days!')">Claim Voucher</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast">Reserved!</div>
+<footer><div class="container">AutoNest • Landing Page 5 of 5 • <a href="index.html" style="color:var(--accent);">Back to Hub</a></div></footer>
+
+<script>
+function updateBundle() {
+  const h = +document.getElementById('bHome').value;
+  const c = +document.getElementById('bCar').value;
+  document.getElementById('bTotal').textContent = '$' + (h + c - 5000).toLocaleString();
+}
+function openModal(t){ document.getElementById('modalTitle').textContent=t; document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+updateBundle();
+</script>
+</body></html>
